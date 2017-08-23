@@ -23,6 +23,15 @@ libraryDependencies ++= {
 libraryDependencies += "io.spray" %%  "spray-json" % "1.3.3"
 
 
+libraryDependencies ++= Seq(
+  "com.typesafe.slick" %% "slick" % "3.2.1",
+  "org.slf4j" % "slf4j-nop" % "1.6.4",
+  "com.typesafe.slick" %% "slick-hikaricp" % "3.2.1"
+)
+
+libraryDependencies += "mysql" % "mysql-connector-java" % "latest.release"
+
+
 Revolver.settings
 
 Twirl.settings

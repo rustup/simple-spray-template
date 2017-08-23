@@ -5,7 +5,14 @@ import spray.routing._
 import spray.http._
 import MediaTypes._
 import spray.httpx.SprayJsonSupport
+import scala.concurrent.duration.Duration
 import spray.json.DefaultJsonProtocol
+import slick.jdbc.MySQLProfile.api._
+import scala.concurrent.{Future, Await}
+
+import slick.relational._
+import scala.reflect.ClassTag
+//import slick.jdbc.JdbcBackend.Table
 import spray.json._
 
 // we don't implement our route structure directly in the service actor because
@@ -40,6 +47,7 @@ trait MyService extends HttpService with SprayJsonSupport{
       get {
         respondWithMediaType(`text/html`) { // XML is marshalled to `text/xml` by default, so we simply override here
           complete {
+            dbutil.getNameSql
             org.example.html.hello("zhangsan", 22).toString()
           }
         }
@@ -57,3 +65,34 @@ trait MyService extends HttpService with SprayJsonSupport{
    }
 
 }
+
+object dbutil {
+  class Spray_Test_Tbl(tag: Tag) extends Table[( Int, String)](tag, "TEST_SPRAY_TBL") {
+    def id = column[Int]("ID")
+    def name  = column[String]("NAME", O.PrimaryKey)
+    def * = (id, name)
+  }
+
+  val db = Database.forURL("jdbc:mysql://127.0.0.1/test_spray",
+    driver = "com.mysql.jdbc.Driver",
+    user="root",
+    password="12345678")
+
+  val spray = TableQuery[Spray_Test_Tbl]
+
+  def getNameSql:String = {
+    val q = spray.filter(s=>s.name==="zhangsan")
+
+    //val x = q.result.statements.head
+    //println(x)
+    //x 内容为
+    //select `ID`, `NAME` from `TEST_SPRAY_TPL` where `NAME` = 'zhangsan'
+/*    val action=q.result
+    Await.result(db.run(action),Duration.Inf)*/
+    val zz = for (x<-q ) yield (x.name )
+    val zd = Await.result( db.run(zz.result), Duration.Inf)
+    println(zd.head)
+    zd.head
+  }
+}
+
