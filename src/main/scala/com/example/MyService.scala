@@ -67,6 +67,7 @@ trait MyService extends HttpService with SprayJsonSupport{
 }
 
 object dbutil {
+  //https://github.com/slick/slick/blob/v3.2.1/doc/code/LiftedEmbedding.scala#L55-L86
   class Spray_Test_Tbl(tag: Tag) extends Table[( Int, String)](tag, "TEST_SPRAY_TBL") {
     def id = column[Int]("ID")
     def name  = column[String]("NAME", O.PrimaryKey)
@@ -74,7 +75,7 @@ object dbutil {
   }
 
   val db = Database.forURL("jdbc:mysql://127.0.0.1/test_spray",
-    driver = "com.mysql.jdbc.Driver",
+    driver = "com.mysql.cj.jdbc.Driver",
     user="root",
     password="12345678")
 
